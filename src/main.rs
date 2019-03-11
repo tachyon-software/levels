@@ -260,16 +260,6 @@ impl hash::Hash for Rank {
     }
 }
 
-impl Rank {
-    fn name(&self) -> String {
-        if let Some(role) = self.role_id.to_role_cached() {
-            role.name
-        } else {
-            self.role_id.0.to_string()
-        }
-    }
-}
-
 enum ParseError {
     Float(num::ParseFloatError),
     Int(num::ParseIntError),
@@ -403,7 +393,7 @@ fn main() -> Result<(), std::io::Error> {
                         let result = Handler::get_users(&state.db);
                         if let Ok(users) = result {
                             info!("{:?}", args);
-                            let res = c.send_message(|_| {
+                            c.send_message(|_| {
                                 create_leaderboard_embed(
                                     users,
                                     state.ranks.clone(),
@@ -412,7 +402,7 @@ fn main() -> Result<(), std::io::Error> {
                                         .map(|x| x.parse::<usize>().unwrap_or(5))
                                         .unwrap_or(5),
                                 )
-                            });
+                            }).expect("Failed to send message");
                         } else {
                             msg.reply(&*format!("Could not grab users ```{:?}```", result))
                                 .expect("Failed to send message");
