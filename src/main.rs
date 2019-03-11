@@ -57,7 +57,7 @@ impl Handler {
             .map(|key| {
                 let data: String = con.get(&*key)?;
                 Ok(XPUser {
-                    user_id: UserId::from(key.parse::<u64>().expect("cock")), // should never fail
+                    user_id: UserId::from(key.parse::<u64>().expect("Failed to get XPUser from User ID")), // should never fail
                     meta: serde_json::from_str(&*data)?,
                 })
             }) // turn String into XPUser
