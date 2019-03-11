@@ -17,7 +17,7 @@ use log::{error, info, warn};
 use rand::{thread_rng, Rng};
 use redis::Commands;
 use serenity::client::{Client, Context};
-use serenity::framework::standard::StandardFramework;
+use serenity::framework::standard::{StandardFramework, CommandError, CommandOptions, Args};
 use serenity::model::{
     channel::Message,
     id::{ChannelId, RoleId, UserId},
@@ -456,26 +456,7 @@ fn main() -> Result<(), std::io::Error> {
                     }
                     Ok(())
                 })
-                .on("announce", |_ctx, msg, mut args| {
-                    info!("{:?}", args);
-                    let des_chan_opt = args.single::<ChannelId>();
-                    let json_opt = args.single::<String>();
-                    if let Some(guild) = msg.guild_id {
-                        if let Ok(des_chan) = des_chan_opt {
-                            let chans = guild.channels().expect("Failed to get channels");
-                            let chan = chans.get(&des_chan);
-                            if let Ok(json_link) = json_opt {
-                                if let Ok(emb) = dbg!(announce::parse_announcement(&*json_link)) {
-                                    if let Some(c) = chan {
-                                        c.send_message(|_| emb.into_embed())
-                                            .expect("Failed to send message");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Ok(())
-                }),
+                .command("announce", |c| c.required_permissions(serenity::model::permissions::Permissions::ADMINISTRATOR).exec(announce))
         );
 
         if let Err(why) = client.start() {
@@ -486,6 +467,28 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     Ok(())
+}
+
+fn announce(ctx: &mut Context, msg: &Message, args: Args) -> Result<(),
+CommandError> {
+  let mut args = args;
+  let des_chan_opt = args.single::<ChannelId>();
+  let json_opt = args.single::<String>();
+  if let Some(guild) = msg.guild_id {
+    if let Ok(des_chan) = des_chan_opt {
+      let chans = guild.channels().expect("Failed to get channels");
+      let chan = chans.get(&des_chan);
+      if let Ok(json_link) = json_opt {
+        if let Ok(emb) = dbg!(announce::parse_announcement(&*json_link)) {
+            if let Some(c) = chan {
+              c.send_message(|_| emb.into_embed())
+                .expect("Failed to send message");
+            }
+        }
+      }
+    }
+  }
+  Ok(())
 }
 
 const BLAST_ICON_URL: &str =
