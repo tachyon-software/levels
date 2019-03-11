@@ -102,7 +102,7 @@ impl EventHandler for Handler {
             let db = &state.db;
             if let Ok(meta) = Handler::get_user(&db, new_message.author.id) {
                 if Utc::now().signed_duration_since(meta.last_activity)
-                    > chrono::Duration::seconds(1)
+                    > chrono::Duration::seconds(5)
                 {
                     let mut rng = thread_rng();
                     let xp = rng.gen_range(0.3, 0.5);
