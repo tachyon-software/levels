@@ -361,9 +361,11 @@ fn main() -> Result<(), std::io::Error> {
         let guild = guild_str.parse::<u64>().expect("Failed to parse guild");
         let ranks: Vec<Rank> = iter
             .map(String::from)
+            .filter(|s| !s.is_empty())
             .map(Rank::from)
             .filter_map(Result::ok)
             .collect();
+        
 
         info!("Serving only guild {} ({} ranks)", guild, ranks.len());
 
