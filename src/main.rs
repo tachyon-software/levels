@@ -574,13 +574,13 @@ fn create_info_embed(
 				} else {
 					format!("<@!{}> has", xp_user.user_id.0.to_string())
 				}
-			}, xp_user.meta.xp,left_xp, {
+			}, xp_user.meta.xp, {
 				if myself {
 					"You"
 				} else {
 					"They"
 				}
-			}, next.role_id.0.to_string())).timestamp(&at); 
+			}, left_xp, next.role_id.0.to_string())).timestamp(&at); 
 		if let Some(avatar_url) = avatar {
 			e = e.thumbnail(avatar_url);
 		}
