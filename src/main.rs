@@ -223,7 +223,7 @@ impl XPUser {
         if a.is_empty() {
             None
         } else {
-            Some(a[0].clone())
+            Some(a[a.len()-1].clone())
         }
     }
 }
